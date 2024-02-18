@@ -1,0 +1,199 @@
+body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+}
+
+header {
+  background-color: #333;
+  color: white;
+  padding: 1rem;
+}
+
+header h1 {
+  margin: 0;
+}
+
+main {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 2rem;
+}
+
+section {
+  flex-basis: 100%;
+  margin-bottom: 2rem;
+}
+
+section h2 {
+  margin: 0 0 1rem;
+}
+
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+label {
+  flex-basis: 100%;
+}
+
+input, textarea, button {
+  flex-basis: 100%;
+  padding: 0.5rem;
+}
+
+input[type="date"] {
+  padding: 0.5rem 0.5rem 0.5rem 0;
+}
+
+textarea {
+  resize: vertical;
+}
+
+button {
+  background-color: #333;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+button:hover {
+  background-color: #444;
+}
+
+footer {
+  background-color: #333;
+  color: white;
+  padding: 1rem;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+footer input, footer button {
+  margin: 0 1rem;
+}
+
+#form-section {
+  padding: 2rem;
+  background-color: #f5f5f5;
+}
+
+#form-section h2 {
+  margin-top: 0;
+}
+
+#tasks-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.task {
+  background-color: #f5f5f5;
+  padding: 1rem;
+  flex-basis: calc(33.333% - 1rem);
+}
+
+.task h3 {
+  margin: 0 0 0.5rem;
+}
+
+.task p {
+  margin: 0;
+}
+
+#form-title {
+  text-align: center;
+}
+
+#tasks-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+#task-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+#task-form input, #task-form textarea {
+  flex-basis: 100%;
+}
+
+#task-form button {
+  flex-basis: calc(50% - 0.5rem);
+}
+
+#passwordinput {
+  width: 10rem;
+}
+
+#form-section {
+  display: none;
+}
+
+#form-section:target {
+  display: flex;
+}
+
+#form-section:target ~ #tasks-section {
+  display: none;
+}
+
+#form-section:target ~ footer {
+  display: none;
+}
+
+#form-section:target ~ #form-title {
+  display: none;
+}
+
+#form-section:target #form-title {
+  display: block;
+}
+
+#form-section:target #task-form {
+  display: flex;
+}
+
+#form-section:target #task-form input[type="hidden"] {
+  display: block;
+}
+
+#form-section:target #task-form input[type="text"],
+#form-section:target #task-form textarea {
+  display: block;
+}
+
+#form-section:target #task-form button[type="submit"] {
+  display: block;
+}
+
+#form-section:target #task-form button[type="button"] {
+  display: none;
+}
+
+#form-section:not(:target) #task-form input[type="hidden"] {
+  display: none;
+}
+
+#form-section:not(:target) #task-form input[type="text"],
+#form-section:not(:target) #task-form textarea {
+  display: none;
+}
+
+#form-section:not(:target) #task-form button[type="submit"] {
+  display: none;
+}
+
+#form-section:not(:target) #task-form button[type="button"] {
+  display: block;
+}
