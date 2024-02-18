@@ -24,15 +24,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const getUser = (username, password) => users.find(user => user.username === username && user.password === password);
 
-  const getTasks = password => {
+
+  const getTasks = username => {
     const user = getUser(username, ''); // Get the user by their password
-    return user ? JSON.parse(localStorage.getItem(user.id)) || [] : []
+    return user ? JSON.parse(localStorage.getItem(currentUser.id)) || [] : []
   }
 
   const saveTasks = (tasks, password) => {
-    const user = getUser('', password); // Get the user by their password
+    const user = getUser(username, password); // Get the user by their password
     if (user) {
-      localStorage.setItem(user.id, JSON.stringify(tasks))
+      localStorage.setItem(currentUser.id, JSON.stringify(tasks))
     }
   }
 
@@ -66,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (user) {
       currentUser = user;
-      const tasks = getTasks(password);
+      const tasks = getTasks(user.username);
       showTasks(tasks);
     } else {
       alert("Invalid username or password");
