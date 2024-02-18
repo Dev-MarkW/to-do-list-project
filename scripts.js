@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const loginBtn = document.getElementById("login-btn");
   const tasksContainer = document.getElementById("tasks-container");
   const taskForm = document.getElementById("task-form");
-  const closeTaskFormBtn = document.getElementById("close-task-form-btn");
+  const closeTaskFormBtn = document.getElementById("cancel-task-form-btn");
   const saveTaskBtn = document.getElementById("save-task-btn");
   const addTaskBtn = document.getElementById("add-task-btn");
   const logoutBtn = document.getElementById("logout-btn");
@@ -12,39 +12,40 @@ document.addEventListener('DOMContentLoaded', () => {
   const dateInput = document.getElementById("date-input");
   const descriptionInput = document.getElementById("description-input");
   const taskIdInput = document.getElementById("task-id-input");
-  let currentUserPassword;
 
-  const users = JSON.parse(localStorage.getItem("user")) || [
-    { username: "user1", password: "password1" },
-    { username: "user2", password: "password2" }
+  let currentUser = null;
+
+  const users = JSON.parse(localStorage.getItem("users")) || [
+    { id: 1, username: "user1", password: "password1" },
+    { id: 2, username: "user2", password: "password2" },
   ];
 
-  localStorage.setItem("user", JSON.stringify(users));
+  localStorage.setItem("users", JSON.stringify(users));
 
   const getUser = (username, password) => users.find(user => user.username === username && user.password === password);
 
-  const getTasks = (password) => {
-    const user = getUser('', password); // Get the user by their password
-    return user ? JSON.parse(localStorage.getItem(user.id)) || [] : [];
-  };
+  const getTasks = password => {
+    const user = getUser(username, ''); // Get the user by their password
+    return user ? JSON.parse(localStorage.getItem(user.id)) || [] : []
+  }
 
   const saveTasks = (tasks, password) => {
     const user = getUser('', password); // Get the user by their password
     if (user) {
-      localStorage.setItem(user.id, JSON.stringify(tasks));
+      localStorage.setItem(user.id, JSON.stringify(tasks))
     }
-  };
+  }
 
-  const showTasks = (tasks) => {
-    tasksContainer.innerHTML = "";
+  const showTasks = tasks => {
+    tasksContainer.innerHTML = ""
     tasks.forEach(({ id, title, date, description }) => {
       tasksContainer.innerHTML += `<div class="task">
-                                  <h2>${title}</h2>
-                                  <p>${date}</p>
-                                  <p>${description}</p>
-                              </div>`;
-    });
-  };
+                                    <h2>${title}</h2>
+                                    <p>${date}</p>
+                                    <p>${description}</p>
+                                  </div>`
+    })
+  }
 
   const addTask = (tasks, title, date, description) => {
     tasks.push({
@@ -52,30 +53,30 @@ document.addEventListener('DOMContentLoaded', () => {
       title: title,
       date: date,
       description: description,
-    });
-    saveTasks(tasks, currentUserPassword);
+    })
+    saveTasks(tasks, currentUser.password);
     showTasks(tasks);
-  };
+  }
 
   const handleLogin = () => {
     const username = usernameInput.value;
     const password = passwordInput.value;
 
-    const user = users.find((user) => user.username === username && user.password === password);
+    const user = getUser(username, password);
 
     if (user) {
-      currentUserPassword = password;
+      currentUser = user;
       const tasks = getTasks(password);
       showTasks(tasks);
     } else {
       alert("Invalid username or password");
     }
-  };
+  }
 
   const handleSaveTask = () => {
-    if (currentUserPassword) {
+    if (currentUser) {
       if (titleInput.value && dateInput.value && descriptionInput.value) {
-        addTask(getTasks(currentUserPassword), titleInput.value, dateInput.value, descriptionInput.value);
+        addTask(getTasks(currentUser.password), titleInput.value, dateInput.value, descriptionInput.value);
         taskForm.reset();
       } else {
         alert("Please fill in all fields");
@@ -83,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       alert("Please login first");
     }
-  };
+  }
 
   const handleCloseTaskForm = () => taskForm.reset();
 
@@ -94,14 +95,15 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       alert("Please add a task");
     }
-  };
+  }
 
   const handleLogout = () => {
     localStorage.clear();
     tasksContainer.innerHTML = "";
     taskForm.reset();
     taskForm.style.display = "none";
-  };
+    currentUser = null;
+  }
 
   loginBtn.addEventListener("click", handleLogin);
   saveTaskBtn.addEventListener("click", handleSaveTask);
@@ -112,29 +114,28 @@ document.addEventListener('DOMContentLoaded', () => {
   taskForm.addEventListener("submit", (event) => {
     event.preventDefault();
 
-    const taskIdInput = document.getElementById("task-id-input");
     const taskId = taskIdInput.value;
 
-    if (currentUserPassword) {
+    if (currentUser) {
       if (titleInput.value || dateInput.value || descriptionInput.value) {
         if (taskId) {
           // Update the task with the given ID
-          const tasks = getTasks(currentUserPassword);
-          const taskIndex = tasks.findIndex((task) => task.id === parseInt(taskId));
+          const tasks = getTasks(currentUser.password);
+          const taskIndex = tasks.findIndex(task => task.id === parseInt(taskId));
           tasks[taskIndex] = {
             ...tasks[taskIndex],
             title: titleInput.value,
             date: dateInput.value,
             description: descriptionInput.value,
-          };
-          saveTasks(tasks, currentUserPassword);
+          }
+          saveTasks(tasks, currentUser.password);
           taskForm.reset();
           taskForm.style.display = "none";
         } else {
           // Create a new task with the given title, date, and description
-          addTask(getTasks(currentUserPassword), titleInput.value, dateInput.value, descriptionInput.value);
+          addTask(getTasks(currentUser.password), titleInput.value, dateInput.value, descriptionInput.value);
           taskForm.reset();
-          showTasks(getTasks(currentUserPassword));
+          showTasks(getTasks(currentUser.password));
         }
       } else {
         alert("Please fill in all fields");
@@ -143,4 +144,4 @@ document.addEventListener('DOMContentLoaded', () => {
       alert("Please login first");
     }
   });
-});
+})
