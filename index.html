@@ -2,41 +2,50 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>To-Do List</title>
+  <title>Learn localStorage by Building a Todo App</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header>
-    <h1>To-Do List</h1>
-  </header>
   <main>
-    <section id="tasks-section">
-      <h2>Tasks</h2>
-      <div id="tasks-container"></div>
-    </section>
-    <section id="form-section" hidden>
-      <h2 id="form-title"></h2>
-      <form id="task-form">
-        <input type="hidden" id="task-id-input" name="task-id-input">
-        <label for="title-input">Title:</label>
-        <input type="text" id="title-input" placeholder="Title" required>
-        <label for="date-input">Date:</label>
-        <input type="date" id="date-input" required>
-        <label for="description-input">Description:</label>
-        <textarea id="description-input" placeholder="Description" required></textarea>
-        <button type="submit" id="save-task-btn">Save</button>
-        <button type="button" id="cancel-task-form-btn">Cancel</button>
+    <h1>Todo App</h1>
+    <div class="todo-app">
+      <select id="user-select"></select>
+      <button id="open-task-form-btn" class="btn large-btn">Add New Task</button>
+      <form id="task-form" class="hidden">
+        <div class="task-form-header">
+          <button id="close-task-form-btn" class="close-task-form-btn" type="button" aria-label="close">
+            <svg class="close-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48px" height="48px">
+              <path fill="#F44336" d="M21.5 4.5H26.501V43.5H21.5z" transform="rotate(45.001 24 24)"></path>
+              <path fill="#F44336" d="M21.5 4.5H26.5V43.501H21.5z" transform="rotate(135.008 24 24)"></path>
+            </svg>
+          </button>
+        </div>
+        <div class="task-form-body">
+          <label class="task-form-label" for="title-input">Title</label>
+          <input required type="text" class="form-control" id="title-input" value="" name="fc">
+          <label class="task-form-label" for="date-input">Date</label>
+          <input type="date" class="form-control" id="date-input" value="">
+          <label class="task-form-label" for="description-input">Description</label>
+          <textarea class="form-control" id="description-input" cols="30" rows="5"></textarea>
+        </div>
+        <div class="task-form-footer">
+          <button id="add-or-update-task-btn" class="btn large-btn" type="submit">Add Task</button>
+        </div>
       </form>
-    </section>
+      <dialog id="confirm-close-dialog">
+        <form method="dialog">
+          <p class="discard-message-text">Discard unsaved changes?</p>
+          <div class="confirm-close-dialog-btn-container">
+            <button id="cancel-btn" class="btn">Cancel</button>
+            <button id="discard-btn" class="btn">Discard</button>
+          </div>
+        </form>
+      </dialog>
+      <div id="tasks-container"></div>
+    </div>
   </main>
-  <footer>
-    <input type="text" id="username-input" placeholder="Username" required />
-    <input type="text" id="password-input" placeholder="Enter password" required />
-    <button id="login-btn">Login</button>
-    <button id="add-task-btn">Add Task</button>
-    <button id="logout-btn">Logout</button>
-  </footer>
+  <script src="scripts.js"></script>
 </body>
-<script src="/scripts.js"></script>
 </html>

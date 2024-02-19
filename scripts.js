@@ -1,148 +1,179 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const passwordInput = document.getElementById("password-input");
-  const usernameInput = document.getElementById("username-input");
-  const loginBtn = document.getElementById("login-btn");
-  const tasksContainer = document.getElementById("tasks-container");
-  const taskForm = document.getElementById("task-form");
-  const closeTaskFormBtn = document.getElementById("cancel-task-form-btn");
-  const saveTaskBtn = document.getElementById("save-task-btn");
-  const addTaskBtn = document.getElementById("add-task-btn");
-  const logoutBtn = document.getElementById("logout-btn");
-  const titleInput = document.getElementById("title-input");
-  const dateInput = document.getElementById("date-input");
-  const descriptionInput = document.getElementById("description-input");
-  const taskIdInput = document.getElementById("task-id-input");
+const taskForm = document.getElementById("task-form");
+const confirmCloseDialog = document.getElementById("confirm-close-dialog");
+const openTaskFormBtn = document.getElementById("open-task-form-btn");
+const closeTaskFormBtn = document.getElementById("close-task-form-btn");
+const addOrUpdateTaskBtn = document.getElementById("add-or-update-task-btn");
+const cancelBtn = document.getElementById("cancel-btn");
+const discardBtn = document.getElementById("discard-btn");
+const tasksContainer = document.getElementById("tasks-container");
+const titleInput = document.getElementById("title-input");
+const dateInput = document.getElementById("date-input");
+const descriptionInput = document.getElementById("description-input");
 
-  let currentUser = null;
+const users = [
+  { name: "Mark", tasks: JSON.parse(localStorage.getItem("Mark data")) || [] },
+  { name: "Sasha", tasks: JSON.parse(localStorage.getItem("Sasha data")) || [] },
+];
 
-  const users = JSON.parse(localStorage.getItem("users")) || [
-    { id: 1, username: "user1", password: "password1" },
-    { id: 2, username: "user2", password: "password2" },
-  ];
+let selectedUser = users[0];
+let currentTask = {};
 
-  localStorage.setItem("users", JSON.stringify(users));
+const addOrUpdateTask = () => {
+  addOrUpdateTaskBtn.innerText = "Add Task";
+  const dataArrIndex = selectedUser.tasks.findIndex(item => item.id === currentTask.id);
 
-  const getUser = (username, password) => users.find(user => user.username === username && user.password === password);
+  if (dataArrIndex !== -1) {
+    selectedUser.tasks[dataArrIndex] = currentTask;
+  } else {
+    const task = {
+      id: `${titleInput.value.toLowerCase().split(" ").join("-")}-${Date.now()}`,
+      title: titleInput.value.trim(),
+      date: dateInput.value,
+      description: descriptionInput.value,
+      completed: false,
+    };
 
-
-  const getTasks = username => {
-    const user = getUser(username, ''); // Get the user by their password
-    return user ? JSON.parse(localStorage.getItem(currentUser.id)) || [] : []
+    selectedUser.tasks.push(task);
   }
 
-  const saveTasks = (tasks, password) => {
-    const user = getUser(username, password); // Get the user by their password
-    if (user) {
-      localStorage.setItem(currentUser.id, JSON.stringify(tasks))
-    }
-  }
+  localStorage.setItem(`${selectedUser.name} data`, JSON.stringify(selectedUser.tasks));
+  updateTaskContainer();
+  reset();
+};
 
-  const showTasks = tasks => {
-    tasksContainer.innerHTML = ""
-    tasks.forEach(({ id, title, date, description }) => {
-      tasksContainer.innerHTML += `<div class="task">
-                                    <h2>${title}</h2>
-                                    <p>${date}</p>
-                                    <p>${description}</p>
-                                  </div>`
-    })
-  }
+const updateTaskContainer = () => {
+  tasksContainer.innerHTML = "";
 
-  const addTask = (tasks, title, date, description) => {
-    tasks.push({
-      id: new Date().getTime(),
-      title: title,
-      date: date,
-      description: description,
-    })
-    saveTasks(tasks, currentUser.password);
-    showTasks(tasks);
-  }
-
-  const handleLogin = () => {
-    const username = usernameInput.value;
-    const password = passwordInput.value;
-
-    const user = getUser(username, password);
-
-    if (user) {
-      currentUser = user;
-      const tasks = getTasks(user.username);
-      showTasks(tasks);
-    } else {
-      alert("Invalid username or password");
-    }
-  }
-
-  const handleSaveTask = () => {
-    if (currentUser) {
-      if (titleInput.value && dateInput.value && descriptionInput.value) {
-        addTask(getTasks(currentUser.password), titleInput.value, dateInput.value, descriptionInput.value);
-        taskForm.reset();
-      } else {
-        alert("Please fill in all fields");
-      }
-    } else {
-      alert("Please login first");
-    }
-  }
-
-  const handleCloseTaskForm = () => taskForm.reset();
-
-  const handleAddTask = () => {
-    if (titleInput.value || dateInput.value || descriptionInput.value) {
-      taskForm.reset();
-      taskForm.style.display = "block";
-    } else {
-      alert("Please add a task");
-    }
-  }
-
-  const handleLogout = () => {
-    localStorage.clear();
-    tasksContainer.innerHTML = "";
-    taskForm.reset();
-    taskForm.style.display = "none";
-    currentUser = null;
-  }
-
-  loginBtn.addEventListener("click", handleLogin);
-  saveTaskBtn.addEventListener("click", handleSaveTask);
-  closeTaskFormBtn.addEventListener("click", handleCloseTaskForm);
-  addTaskBtn.addEventListener("click", handleAddTask);
-  logoutBtn.addEventListener("click", handleLogout);
-
-  taskForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-
-    const taskId = taskIdInput.value;
-
-    if (currentUser) {
-      if (titleInput.value || dateInput.value || descriptionInput.value) {
-        if (taskId) {
-          // Update the task with the given ID
-          const tasks = getTasks(currentUser.password);
-          const taskIndex = tasks.findIndex(task => task.id === parseInt(taskId));
-          tasks[taskIndex] = {
-            ...tasks[taskIndex],
-            title: titleInput.value,
-            date: dateInput.value,
-            description: descriptionInput.value,
-          }
-          saveTasks(tasks, currentUser.password);
-          taskForm.reset();
-          taskForm.style.display = "none";
-        } else {
-          // Create a new task with the given title, date, and description
-          addTask(getTasks(currentUser.password), titleInput.value, dateInput.value, descriptionInput.value);
-          taskForm.reset();
-          showTasks(getTasks(currentUser.password));
-        }
-      } else {
-        alert("Please fill in all fields");
-      }
-    } else {
-      alert("Please login first");
-    }
+  selectedUser.tasks.forEach(({ id, title, date, description, completed }) => {
+    tasksContainer.innerHTML += `
+        <div class="task" id="${id}">
+          <input type="checkbox" id="task-${id}-toggle" ${completed ? "checked" : ""} onclick="toggleTaskCompleted(this)">
+          <label for="task-${id}-toggle">Completed</label>
+          <p><strong>Title:</strong> ${title}</p>
+          <p><strong>Date:</strong> ${date}</p>
+          <p><strong>Description:</strong> ${description}</p>
+          <button onclick="editTask(this)" type="button" class="btn">Edit</button>
+          <button onclick="deleteTask(this)" type="button" class="btn">Delete</button>
+        </div>
+      `;
   });
-})
+};
+
+const deleteTask = (buttonEl) => {
+  const taskId = buttonEl.parentElement.id;
+  selectedUser.tasks = selectedUser.tasks.filter((task) => task.id !== taskId);
+  localStorage.setItem(`${selectedUser.name} data`, JSON.stringify(selectedUser.tasks));
+  buttonEl.parentElement.remove();
+};
+
+const editTask = (buttonEl) => {
+  const dataArrIndex = selectedUser.tasks.findIndex(item => item.id === currentTask.id);
+
+  currentTask = { ...selectedUser.tasks[dataArrIndex] };
+  console.log(currentTask);
+  
+  titleInput.value = currentTask.title;
+  dateInput.value = currentTask.date;
+  descriptionInput.value = currentTask.description;
+
+
+  addOrUpdateTaskBtn.innerText = "Update Task";
+
+  taskForm.classList.toggle("hidden");
+};
+
+const reset = () => {
+  titleInput.value = "";
+  dateInput.value = "";
+  descriptionInput.value = "";
+  taskForm.classList.toggle("hidden");
+  currentTask = {};
+};
+
+if (selectedUser.tasks.length) {
+  updateTaskContainer();
+}
+
+openTaskFormBtn.addEventListener("click", () =>
+  taskForm.classList.toggle("hidden")
+);
+
+closeTaskFormBtn.addEventListener("click", () => {
+  const formInputsContainValues = titleInput.value || dateInput.value || descriptionInput.value;
+  const formInputValuesUpdated = titleInput.value !== currentTask.title || dateInput.value !== currentTask.date || descriptionInput.value !== currentTask.description;
+
+  if (formInputsContainValues && formInputValuesUpdated) {
+    confirmCloseDialog.showModal();
+  } else {
+    reset();
+  }
+});
+
+cancelBtn.addEventListener("click", () => confirmCloseDialog.close);
+
+discardBtn.addEventListener("click", () => {
+  confirmCloseDialog.close;
+  reset();
+});
+
+taskForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+
+  addOrUpdateTask();
+
+
+});
+
+addOrUpdateTaskBtn.addEventListener("click", (e) => { 
+  currentTask.title = titleInput.value; 
+  currentTask.date = dateInput.value; 
+  currentTask.description = descriptionInput.value;
+
+  if (currentTask.id === "") {
+    currentTask.id = `${titleInput.value.toLowerCase().split(" ").join("-")}-${Date.now()}`;
+  }
+
+const dataArrIndex = selectedUser.tasks.findIndex(item => item.id === currentTask.id);
+
+if (dataArrIndex !== -1) { 
+  selectedUser.tasks[dataArrIndex] = currentTask; 
+  } else { 
+  selectedUser.tasks.push(currentTask);
+  };
+
+localStorage.setItem(`${selectedUser.name} data`, 
+JSON.stringify(selectedUser.tasks));
+updateTaskContainer( );
+reset();
+});
+
+const userSelect = document.getElementById("user-select");
+
+users.forEach((user) => {
+  const option = document.createElement("option");
+  option.value = user.name;
+  option.textContent = user.name;
+  userSelect.appendChild(option);
+});
+
+userSelect.addEventListener("change", (e) => {
+  selectedUser = users.find((user) => user.name === e.target.value);
+  updateTaskContainer();
+});
+
+const toggleTaskCompleted = (checkboxEl) => {
+  if (!selectedUser || !selectedUser.tasks || selectedUser.tasks.length === 0) {
+    return;
+  }
+
+  const taskId = checkboxEl.id.split("-")[1];
+  const task = selectedUser.tasks.find((task) => task.id === taskId);
+
+  if (!task) {
+    return;
+  }
+
+  task.completed = !task.completed;
+  localStorage.setItem(`${selectedUser.name} data`, JSON.stringify(selectedUser.tasks));
+  updateTaskContainer();
+};
