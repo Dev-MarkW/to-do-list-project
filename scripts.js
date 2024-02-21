@@ -20,7 +20,9 @@ let currentTask = {};
 
 const addOrUpdateTask = () => {
   addOrUpdateTaskBtn.innerText = "Add Task";
-  const dataArrIndex = selectedUser.tasks.findIndex(item => item.id === currentTask.id);
+  const dataArrIndex = selectedUser.tasks.findIndex(
+    (item) => item.id === currentTask.id
+  );
 
   if (dataArrIndex !== -1) {
     selectedUser.tasks[dataArrIndex] = currentTask;
@@ -36,7 +38,10 @@ const addOrUpdateTask = () => {
     selectedUser.tasks.push(task);
   }
 
-  localStorage.setItem(`${selectedUser.name} data`, JSON.stringify(selectedUser.tasks));
+  localStorage.setItem(
+    `${selectedUser.name} data`,
+    JSON.stringify(selectedUser.tasks)
+  );
   updateTaskContainer();
   reset();
 };
@@ -62,24 +67,32 @@ const updateTaskContainer = () => {
 const deleteTask = (buttonEl) => {
   const taskId = buttonEl.parentElement.id;
   selectedUser.tasks = selectedUser.tasks.filter((task) => task.id !== taskId);
-  localStorage.setItem(`${selectedUser.name} data`, JSON.stringify(selectedUser.tasks));
+  localStorage.setItem(
+    `${selectedUser.name} data`,
+    JSON.stringify(selectedUser.tasks)
+  );
   buttonEl.parentElement.remove();
 };
 
 const editTask = (buttonEl) => {
-  const dataArrIndex = selectedUser.tasks.findIndex(item => item.id === currentTask.id);
+  const dataArrIndex = selectedUser.tasks.findIndex(
+    (item) => item.id === currentTask.id
+  );
 
-  currentTask = { ...selectedUser.tasks[dataArrIndex] };
-  console.log(currentTask);
-  
+  if (dataArrIndex !== -1) {
+    currentTask = { ...selectedUser.tasks[dataArrIndex] };
+  }
+
   titleInput.value = currentTask.title;
   dateInput.value = currentTask.date;
   descriptionInput.value = currentTask.description;
 
-
   addOrUpdateTaskBtn.innerText = "Update Task";
 
   taskForm.classList.toggle("hidden");
+
+  currentTask = { ...selectedUser.tasks[dataArrIndex] };
+  addOrUpdateTaskBtn.innerText = "Update Task";
 };
 
 const reset = () => {
@@ -92,15 +105,18 @@ const reset = () => {
 
 if (selectedUser.tasks.length) {
   updateTaskContainer();
+  openTaskFormBtn.addEventListener("click", () =>
+    taskForm.classList.toggle("hidden")
+  );
 }
 
-openTaskFormBtn.addEventListener("click", () =>
-  taskForm.classList.toggle("hidden")
-);
-
 closeTaskFormBtn.addEventListener("click", () => {
-  const formInputsContainValues = titleInput.value || dateInput.value || descriptionInput.value;
-  const formInputValuesUpdated = titleInput.value !== currentTask.title || dateInput.value !== currentTask.date || descriptionInput.value !== currentTask.description;
+  const formInputsContainValues =
+    titleInput.value || dateInput.value || descriptionInput.value;
+  const formInputValuesUpdated =
+    titleInput.value !== currentTask.title ||
+    dateInput.value !== currentTask.date ||
+    descriptionInput.value !== currentTask.description;
 
   if (formInputsContainValues && formInputValuesUpdated) {
     confirmCloseDialog.showModal();
@@ -120,31 +136,29 @@ taskForm.addEventListener("submit", (e) => {
   e.preventDefault();
 
   addOrUpdateTask();
-
-
 });
 
-addOrUpdateTaskBtn.addEventListener("click", (e) => { 
-  currentTask.title = titleInput.value; 
-  currentTask.date = dateInput.value; 
+addOrUpdateTaskBtn.addEventListener("click", (e) => {
+  currentTask.title = titleInput.value;
+  currentTask.date = dateInput.value;
   currentTask.description = descriptionInput.value;
 
-  if (currentTask.id === "") {
-    currentTask.id = `${titleInput.value.toLowerCase().split(" ").join("-")}-${Date.now()}`;
+  const dataArrIndex = selectedUser.tasks.findIndex(
+    (item) => item.id === currentTask.id
+  );
+
+  if (dataArrIndex !== -1) {
+    selectedUser.tasks[dataArrIndex] = currentTask;
+  } else {
+    selectedUser.tasks.push(currentTask);
   }
 
-const dataArrIndex = selectedUser.tasks.findIndex(item => item.id === currentTask.id);
-
-if (dataArrIndex !== -1) { 
-  selectedUser.tasks[dataArrIndex] = currentTask; 
-  } else { 
-  selectedUser.tasks.push(currentTask);
-  };
-
-localStorage.setItem(`${selectedUser.name} data`, 
-JSON.stringify(selectedUser.tasks));
-updateTaskContainer( );
-reset();
+  localStorage.setItem(
+    `${selectedUser.name} data`,
+    JSON.stringify(selectedUser.tasks)
+  );
+  updateTaskContainer();
+  reset();
 });
 
 const userSelect = document.getElementById("user-select");
@@ -157,7 +171,9 @@ users.forEach((user) => {
 });
 
 userSelect.addEventListener("change", (e) => {
-  selectedUser = users.find((user) => user.name === e.target.value);
+  selectedUser = users.find(
+    (user) => user.name === e.target.value
+  );
   updateTaskContainer();
 });
 
@@ -174,6 +190,9 @@ const toggleTaskCompleted = (checkboxEl) => {
   }
 
   task.completed = !task.completed;
-  localStorage.setItem(`${selectedUser.name} data`, JSON.stringify(selectedUser.tasks));
+  localStorage.setItem(
+    `${selectedUser.name} data`,
+    JSON.stringify(selectedUser.tasks)
+  );
   updateTaskContainer();
 };
